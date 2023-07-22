@@ -99,7 +99,7 @@ const createSoundBox = async (safeWallet) => {
   // );
 
   const salt =
-    "0x00000000000000000000000000000000000000000000000000000000000000015";
+    "0x00000000000000000000000000000000000000000000000000000000000000016";
   // const ultimate_deployed_sound_contract = await factory_sound_contract.Deploy(
   //   salt
   // );
@@ -120,7 +120,7 @@ const createSoundBox = async (safeWallet) => {
   );
 
   const createContract = new ethers.Contract(
-    "0xD1c9a4F2B8bC4860ed5Be691367B3BfC2571862F",
+    "0x948d045406032Cbc1839B000737cC603436E697C",
     Create2Compute.abi,
     ethProvider
   );

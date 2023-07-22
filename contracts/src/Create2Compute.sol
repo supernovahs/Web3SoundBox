@@ -9,7 +9,7 @@ contract Create2Compute {
         bytes memory bytecode = type(SoundBox).creationCode;
         bytes32 hash = keccak256(
             abi.encodePacked(
-                bytes1(0x00),
+                bytes1(0xFF),
                 creator,
                 bytes32(_salt),
                 keccak256(bytecode)
