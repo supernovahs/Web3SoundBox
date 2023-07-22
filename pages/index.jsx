@@ -5,8 +5,10 @@ import QRCode from "react-qr-code";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import { Modal, Input, Row, Checkbox, Button, Text } from "@nextui-org/react";
-
+import {ethers} from "ethers";
 import getLatestTransaction from "../lib/etherscan";
+
+
 
 const Home = () => {
   const { address, isConnected } = useAccount();
@@ -14,6 +16,7 @@ const Home = () => {
   const [txData, setTxData] = useState(null);
   const [oldTxs, setOldTxs] = useState([]);
 
+   
   const closeHandler = () => {
     setTxData(null);
   };
@@ -45,6 +48,37 @@ const Home = () => {
       }
       return oldTxs;
     });
+  }
+
+  async function trackBalanceChanges() {
+    // there is existing sound box contract
+    if (!window.localStorage.getItem("sound-box")) {
+      window.localStorage.setItem("sound-box",0x9Bdf5f0FD08Ebfe723e0CA52867AD647B61a89bE);
+    }
+    const NoOfChains = 4;
+    
+    let mumbaiprovider = new ethers.providers.JsonRpcProvider(process.env.NEXT_PUBLIC_MUMBAI_RPC)
+    let goerliprovider = new ethers.providers.JsonRpcProvider(process.env.NEXT_PUBLIC_GOERLI_RPC);
+    let basegoerliprovider = new ethers.providers.JsonRpcProvider(process.env.NEXT_PUBLIC_BASE_RPC);
+    let arrchains = [{"provider":mumbaiprovider,"usdcaddress":0x9Bdf5f0FD08Ebfe723e0CA52867AD647B61a89bE},{"provider": goerliprovider,"usdcaddress":0x9Bdf5f0FD08Ebfe723e0CA52867AD647B61a89bE},{"provider":basegoerliprovider,"usdcaddress":0x9Bdf5f0FD08Ebfe723e0CA52867AD647B61a89bE}]
+    console.log(arrchains[0].provider,arrchains[1].provider,arrchains[2].provider);
+    let IERC20_abi = ["function balanceOf(address) external returns(uint256"];
+    let addresssoundbox = window.localStorage.getItem("sound-box");
+    for(let i = 0; i < NoOfChains;i++){
+      let contractinstance = new ethers.Contract(arrchains[i].usdcaddress,IERC20_abi,arrchains[i].provider);
+      let amount = contractinstance.balanceOf(addresssoundbox);
+      if(amount > 0){
+        await create(addresssoundbox,arrchains[i].provider);
+      }
+    }
+  }
+
+  async function create(addresssoundbox,chainprovider) {
+    let abi = ["function Transfer_tokens(string memory) external"];
+    const signer = new ethers.Wallet(process.env.NEXT_PUBLIC_PVT_KEY,chainprovider);
+    console.log('signer',signer);
+    let instance = new ethers.Contract(addresssoundbox,abi,signer);
+    await instance.Transfer_tokens(0xF4813D9C551D0D8A139DD24Fbbf2cD29D87E83Ec);
   }
 
   return (

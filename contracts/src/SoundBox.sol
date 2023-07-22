@@ -13,7 +13,7 @@ contract SoundBox is AxelarExecutable {
     string public DESTINATION_CHAIN;
 
     string public constant SYMBOL = 'aUSDC';
-
+    uint public SystemUSDC;
     IERC20 public  USDC;
     IERC20 public  aUSDC;
     IAxelarGasService public  GAS_SERVICE;
@@ -33,8 +33,8 @@ contract SoundBox is AxelarExecutable {
 
     function Transfer_tokens(string memory RECEIVER_CONTRACT) public payable  {
         bytes memory payload = abi.encode(MERCHANT);
-        // @audit not usdc .
-        uint amount = USDC.balanceOf(address(this));
+        uint amount =  USDC.balanceOf(address(this)) - SystemUSDC;
+        SystemUSDC += amount;
         if (msg.value > 0) {
             GAS_SERVICE.payNativeGasForContractCallWithToken{ value: msg.value }(
                 address(this),
