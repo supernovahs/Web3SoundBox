@@ -11,12 +11,18 @@ import {
 } from "@nextui-org/react";
 import Head from "next/head";
 
-import { createWallet, getWallets, loginWithEmail } from "../../lib/dfns";
+import {
+  createWallet,
+  deploySafe,
+  getWallets,
+  loginWithEmail,
+} from "../../lib/dfns";
 import { deployContracts } from "../../lib/deploy";
 const Start = () => {
   const [email, setEmail] = useState("");
   const [error, setError] = useState(null);
   const [network, setNetwork] = useState(null);
+  const [address, setAddress] = useState(null);
 
   const [loadingState, setLoadingState] = useState(null);
 
@@ -33,10 +39,17 @@ const Start = () => {
     getWallets().then(async (wallets) => {
       console.log(wallets);
     });
-    // if (loadingState ?? "".includes("Register")) {
-    //   await createWallet(email, (event) => setLoadingState(event));
+    if (loadingState ?? "".includes("Register")) {
+      await createWallet(email, (event) => setLoadingState(event));
+      const wallet = (await getWallets()).items[0];
+      setLoadingState(null);
+      setAddress(wallet.address);
+    }
+  };
+
+  const handleDeploy = async (e) => {
+    await deploySafe((event) => setLoadingState(event));
     await deployContracts((event) => setLoadingState(event));
-    // }
   };
   return (
     <>
@@ -71,9 +84,44 @@ const Start = () => {
               >
                 {loadingState}
               </Loading>
+            ) : address ? (
+              <>
+                <Text
+                  h3
+                  size={24}
+                  css={{
+                    textGradient: "45deg, $blue600 -20%, $blue500 50%",
+                    textAlign: "center",
+                  }}
+                  weight="bold"
+                >
+                  Add Funds
+                </Text>
+                <Text
+                  h6
+                  size={16}
+                  css={{
+                    textAlign: "center",
+                    margin: "auto",
+                  }}
+                  weight="bold"
+                >
+                  {address}
+                </Text>
+                <Button
+                  type="submit"
+                  color="primary"
+                  css={{
+                    mt: "auto",
+                    marginBottom: "20px",
+                  }}
+                  onClick={handleDeploy}
+                >
+                  Deploy
+                </Button>
+              </>
             ) : (
               <>
-                {" "}
                 <Text
                   h1
                   size={50}

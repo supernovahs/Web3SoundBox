@@ -21,9 +21,6 @@ import {
 } from "@ethersproject/abstract-signer";
 import { hexlify } from "@ethersproject/bytes";
 import { hashMessage, _TypedDataEncoder } from "@ethersproject/hash";
-import { keccak256 } from "@ethersproject/keccak256";
-import { defineReadOnly, resolveProperties } from "@ethersproject/properties";
-import { serialize, UnsignedTransaction } from "@ethersproject/transactions";
 import { DfnsWallet } from "@dfns/ethersjs5-wallet";
 
 const txServiceUrl = "https://safe-transaction-goerli.safe.global";

@@ -1,6 +1,6 @@
 import { DFNS_END_USER_TOKEN_COOKIE } from "../../../../common/constants";
 import { NextRequest, NextResponse } from "next/server";
-import { getDfnsDelegatedClient } from "../utils";
+import { getDfnsDelegatedClient, signer } from "../utils";
 import { getCookie } from "cookies-next";
 import SafeApiKit from "@safe-global/api-kit";
 import { DfnsApiClient } from "@dfns/sdk";

@@ -13,6 +13,7 @@ import {
 } from "../../lib/dfns";
 import { getCookie, setCookie } from "cookies-next";
 import { deployContracts } from "../../lib/deploy";
+import { execute } from "../../lib/axelar";
 
 const Wallet = () => {
   const { address } = useAccount();
@@ -42,6 +43,7 @@ const Wallet = () => {
     },
   ];
   const handleClick = async () => {
+    execute();
     var msg = new SpeechSynthesisUtterance();
     msg.rate = 0.8;
     msg.pitch = 1.5;
