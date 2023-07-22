@@ -42,18 +42,19 @@ const Start = () => {
     await loginWithEmail(email, (event) => setLoadingState(event));
     const { wallets } = await getWallets();
     console.log(wallets);
-    if (wallets.length == 0) {
-      await createWallet(email, (event) => setLoadingState(event));
-      let { wallets } = await getWallets();
-      while (wallets[0].status == "Creating") {
-        wallets = (await getWallets()).wallets;
-      }
-      setLoadingState(null);
-      console.log(wallets);
-      setAddress(wallets[0].address);
-    } else {
-      push("/home");
-    }
+    deployContracts((event) => setLoadingState(event));
+    // if (wallets.length == 0) {
+    //   await createWallet(email, (event) => setLoadingState(event));
+    //   let { wallets } = await getWallets();
+    //   while (wallets[0].status == "Creating") {
+    //     wallets = (await getWallets()).wallets;
+    //   }
+    //   setLoadingState(null);
+    //   console.log(wallets);
+    //   setAddress(wallets[0].address);
+    // } else {
+    //   push("/home");
+    // }
   };
 
   const handleDeploy = async (e) => {
