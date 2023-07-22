@@ -1,8 +1,9 @@
 {
   "/_app": "pages/_app.js",
-  "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/wallet": "pages/wallet.js",
-  "/login": "pages/login.js",
-  "/": "pages/index.js"
+  "/_error": "pages/_error.js",
+  "/api/dfns/users": "pages/api/dfns/users.js",
+  "/start": "pages/start.js",
+  "/api/dfns/register/init": "pages/api/dfns/register/init.js",
+  "/api/dfns/register/complete": "pages/api/dfns/register/complete.js"
 }
