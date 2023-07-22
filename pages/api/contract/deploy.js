@@ -86,14 +86,14 @@ const createSoundBox = async () => {
 
   // console.log("deployed contract:", deployed_sound_contract);
 
-  const instance = new ethers.ContractFactory(
+  const instance = new ethers.Contract(
+    "0x9Bdf5f0FD08Ebfe723e0CA52867AD647B61a89bE",
     soundboxabi.abi,
-    soundboxabi.bytecode.object,
     signer
   );
   console.log("instance",instance);
 
-  const tx = await instance.initialize(0x80Bd34829c721E409ec6b5117bfdf9D6F6ffdA82,"ethereum-2",0xC77ee0f70Fb952193166ddF8Bf0B60C978423dDC,0xBF62ef1486468a6bd26Dd669C06db43dEd5B849B,0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6,0x79E5f77032600f9d9E4457d97D8A5d447bEffD98);
+  const tx = await instance['initialize(address,string,address,address,address,string)']("0x80Bd34829c721E409ec6b5117bfdf9D6F6ffdA82","ethereum-2","0xC77ee0f70Fb952193166ddF8Bf0B60C978423dDC","0xBF62ef1486468a6bd26Dd669C06db43dEd5B849B","0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6","0x79E5f77032600f9d9E4457d97D8A5d447bEffD98");
     console.log("tx",tx);
 
   return instance.address;
