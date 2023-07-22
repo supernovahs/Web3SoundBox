@@ -9,6 +9,7 @@ import { ethers } from "ethers";
 import destinationchainabi from "../../../assets/DestinationChain.json";
 import soundboxabi from "../../../assets/SoundBox.json";
 import FactorySoundabi from "../../../assets/FactorySoundContract.json";
+import Create2Compute from "../../../assets/Create2Compute.json";
 const txServiceUrl = "https://safe-transaction-goerli.safe.global";
 
 export default async function handler(req, res) {
@@ -98,7 +99,7 @@ const createSoundBox = async (safeWallet) => {
   );
 
   const salt =
-    "0x00000000000000000000000000000000000000000000000000000000000000011";
+    "0x00000000000000000000000000000000000000000000000000000000000000016";
   const ultimate_deployed_sound_contract = await factory_sound_contract.Deploy(
     salt
   );
@@ -114,25 +115,21 @@ const createSoundBox = async (safeWallet) => {
   // console.log("deployed contract:",await ultimate_deployed_sound_contract.address);
   // console.log("linea contract address",await ultimate_deployed_linea_contract.address);
 
-  const creatorAddress = "0xEBF5560A8054794B450c921Bf05F0b915a598d16";
-  const initCode = "0x00";
-
   const ethProvider = new ethers.providers.JsonRpcProvider(
     "https://rpc.ankr.com/eth_goerli"
   );
 
   const createContract = new ethers.Contract(
     "0xDb94EAc063a83a9D3f75Ecc282B7eaa3A3784Aac",
+    Create2Compute.abi,
+    ethProvider
   );
 
+  const predAddress = await createContract.getCreate2Address(salt);
 
-  console.log("predict address", contractAddress);
+  console.log("predict address", predAddress);
 
-  const instance = new ethers.Contract(
-    contractAddress,
-    soundboxabi.abi,
-    signer
-  );
+  const instance = new ethers.Contract(predAddress, soundboxabi.abi, signer);
   console.log("instance", instance);
 
   const tx = await instance[
@@ -148,7 +145,7 @@ const createSoundBox = async (safeWallet) => {
   console.log("poly tx", await tx.wait());
 
   const lineainstance = new ethers.Contract(
-    contractAddress,
+    predAddress,
     soundboxabi.abi,
     lineasigner
   );
