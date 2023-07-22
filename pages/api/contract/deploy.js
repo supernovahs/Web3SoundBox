@@ -8,6 +8,7 @@ import { EthersAdapter } from "@safe-global/protocol-kit";
 import { ethers } from "ethers";
 import destinationchainabi from "../../../assets/DestinationChain.json";
 import soundboxabi from "../../../assets/SoundBox.json";
+import FactorySoundabi from "../../../assets/FactorySoundContract.json";
 const txServiceUrl = "https://safe-transaction-goerli.safe.global";
 
 export default async function handler(req, res) {
@@ -52,11 +53,6 @@ export default async function handler(req, res) {
       ethAdapter: ethAdapter,
     });
 
-    const safeWallet = (
-      await safeService.getSafesByOwner(await wallet.getAddress())
-    ).safes[0];
-
-    console.log("safe wallet", safeWallet);
     const contractAddress = await createSoundBox();
 
     return res.status(200).json({ contractAddress });
@@ -67,34 +63,74 @@ const createSoundBox = async () => {
   const provider = new ethers.providers.JsonRpcProvider(
     "https://endpoints.omniatech.io/v1/matic/mumbai/public"
   );
-  console.log;
+  
   const pvtkey =
-    "61ca9882057770df2bf5ce9fc3fb8f006bf07e9a7c6d7c46322640ae39d0214c";
+    "6b3417689eba0697d4cdb4b9eb3b9c40838cc143f6d871e4fecc5a0391c6f5db";
+    const lineaprovider = new ethers.providers.JsonRpcProvider("https://rpc.goerli.linea.build");
+    // console.log("linea",lineaprovider);
+    const lineasigner = new ethers.Wallet(pvtkey,lineaprovider);
+    const signer = new ethers.Wallet(pvtkey, provider);
+    
 
-  const signer = new ethers.Wallet(pvtkey, provider);
-  console.log("signer", signer);
+    const factory_sound_contract = new ethers.Contract(
+      "0xEBF5560A8054794B450c921Bf05F0b915a598d16",
+      FactorySoundabi.abi,
+      signer
+    );
 
-  // const soundboxcontract = new ethers.ContractFactory(
-  //   soundboxabi.abi,
-  //   soundboxabi.bytecode.object,
-  //   signer
-  // );
 
-  // console.log("soundbox contract", soundboxabi);
 
-  // const deployed_sound_contract = await soundboxcontract.deploy();
+    const linea_factory_sound_contract = new ethers.Contract(
+      "0xEBF5560A8054794B450c921Bf05F0b915a598d16",
+      FactorySoundabi.abi,
+      lineasigner
+    );
 
-  // console.log("deployed contract:", deployed_sound_contract);
 
+   
+
+    const salt = "0x0000000000000000000000000000000000000000000000000000000000000006";
+    const ultimate_deployed_sound_contract = await  factory_sound_contract.Deploy(salt);
+    const resp1 = await ultimate_deployed_sound_contract.wait();
+
+    
+
+    const ultimate_deployed_linea_contract = await  linea_factory_sound_contract.Deploy(salt,{gasPrice:30000000000});
+    const resp2 = await ultimate_deployed_linea_contract.wait();
+
+    console.log("response 1: ", resp1);
+    console.log("response 2: ",resp2);
+
+  // console.log("deployed contract:",await ultimate_deployed_sound_contract.address);
+  // console.log("linea contract address",await ultimate_deployed_linea_contract.address);
+  const safeWallet = (
+    await safeService.getSafesByOwner(await wallet.getAddress())
+  ).safes[0];
+
+  console.log("safe wallet", safeWallet);
+  
   const instance = new ethers.Contract(
-    "0x9Bdf5f0FD08Ebfe723e0CA52867AD647B61a89bE",
+    ultimate_deployed_sound_contract.address,
     soundboxabi.abi,
     signer
   );
   console.log("instance",instance);
 
-  const tx = await instance['initialize(address,string,address,address,address,string)']("0x80Bd34829c721E409ec6b5117bfdf9D6F6ffdA82","ethereum-2","0xC77ee0f70Fb952193166ddF8Bf0B60C978423dDC","0xBF62ef1486468a6bd26Dd669C06db43dEd5B849B","0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6","0x79E5f77032600f9d9E4457d97D8A5d447bEffD98");
+  const tx = await instance['initialize(address,string,address,address,address,string)'](safeWallet,"ethereum-2","0x355345F9b591b0Bf86b580EaA09A7A00C0c87568","0xBF62ef1486468a6bd26Dd669C06db43dEd5B849B","0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6","0x79E5f77032600f9d9E4457d97D8A5d447bEffD98");
     console.log("tx",tx);
 
-  return instance.address;
+
+
+  const lineainstance =  new ethers.Contract(
+    ultimate_deployed_linea_contract.address,
+    soundboxabi.abi,
+    lineasigner
+  );
+
+  const lineatx = await lineainstance['initialize(address,string,address,address,address,string)'](safeWallet,"ethereum-2","0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6","0xe432150cce91c13a887f7D836923d5597adD8E31","0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6","0x79E5f77032600f9d9E4457d97D8A5d447bEffD98");
+    console.log("tx",lineatx);
+
+
+      // return 0x222;
+  // return instance.address;
 };
