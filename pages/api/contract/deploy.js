@@ -74,17 +74,27 @@ const createSoundBox = async () => {
   const signer = new ethers.Wallet(pvtkey, provider);
   console.log("signer", signer);
 
-  const soundboxcontract = new ethers.ContractFactory(
+  // const soundboxcontract = new ethers.ContractFactory(
+  //   soundboxabi.abi,
+  //   soundboxabi.bytecode.object,
+  //   signer
+  // );
+
+  // console.log("soundbox contract", soundboxabi);
+
+  // const deployed_sound_contract = await soundboxcontract.deploy();
+
+  // console.log("deployed contract:", deployed_sound_contract);
+
+  const instance = new ethers.ContractFactory(
     soundboxabi.abi,
     soundboxabi.bytecode.object,
     signer
   );
+  console.log("instance",instance);
 
-  console.log("soundbox contract", soundboxabi);
+  const tx = await instance.initialize(0x80Bd34829c721E409ec6b5117bfdf9D6F6ffdA82,"ethereum-2",0xC77ee0f70Fb952193166ddF8Bf0B60C978423dDC,0xBF62ef1486468a6bd26Dd669C06db43dEd5B849B,0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6,0x79E5f77032600f9d9E4457d97D8A5d447bEffD98);
+    console.log("tx",tx);
 
-  const deployed_sound_contract = await soundboxcontract.deploy();
-
-  console.log("deployed contract:", deployed_sound_contract);
-
-  return deployed_sound_contract.address;
+  return instance.address;
 };
