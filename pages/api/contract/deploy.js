@@ -51,8 +51,14 @@ export default async function handler(req, res) {
       ethAdapter: ethAdapter,
     });
 
-    const safeWallet = (await safeService.getSafesByOwner(await wallet.getAddress()))
-      .safes[0];
+    // const safeWallet = (await safeService.getSafesByOwner(await wallet.getAddress()))
+    //   .safes[0];
+
+
+    const safeWallet = 0x305AEdB55Cd62106e075f0fE6cbDF0DA52FeDbDB;
+
+    
+
 
     return res.status(200).json(safeWallet);
   }
