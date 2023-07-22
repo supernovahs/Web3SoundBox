@@ -1,3 +1,4 @@
+"use client";
 import { useEffect, useState } from "react";
 import {
   Text,
@@ -10,6 +11,7 @@ import {
   Loading,
 } from "@nextui-org/react";
 import Head from "next/head";
+import { useRouter } from "next/navigation";
 
 import {
   createWallet,
@@ -19,6 +21,8 @@ import {
 } from "../../lib/dfns";
 import { deployContracts } from "../../lib/deploy";
 const Start = () => {
+  const { push } = useRouter();
+
   const [email, setEmail] = useState("");
   const [error, setError] = useState(null);
   const [network, setNetwork] = useState(null);
@@ -36,20 +40,29 @@ const Start = () => {
   const handleSubmit = async (e) => {
     setLoadingState("Loading...");
     await loginWithEmail(email, (event) => setLoadingState(event));
-    getWallets().then(async (wallets) => {
-      console.log(wallets);
-    });
-    if (loadingState ?? "".includes("Register")) {
+    const { wallets } = await getWallets();
+    console.log(wallets);
+    if (wallets.length == 0) {
       await createWallet(email, (event) => setLoadingState(event));
-      const wallet = (await getWallets()).items[0];
+      let { wallets } = await getWallets();
+      while (wallets[0].status == "Creating") {
+        wallets = (await getWallets()).wallets;
+      }
       setLoadingState(null);
-      setAddress(wallet.address);
+      console.log(wallets);
+      setAddress(wallets[0].address);
+    } else {
+      push("/home");
     }
   };
 
   const handleDeploy = async (e) => {
     await deploySafe((event) => setLoadingState(event));
     await deployContracts((event) => setLoadingState(event));
+    setTimeout(() => {
+      setLoadingState(null);
+      push("/home");
+    }, 5000);
   };
   return (
     <>
