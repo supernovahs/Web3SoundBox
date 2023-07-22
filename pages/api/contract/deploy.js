@@ -9,7 +9,6 @@ import { ethers } from "ethers";
 import destinationchainabi from "../../../assets/DestinationChain.json";
 import soundboxabi from "../../../assets/SoundBox.json";
 import FactorySoundabi from "../../../assets/FactorySoundContract.json";
-import ethCreate2 from "eth-create2";
 const txServiceUrl = "https://safe-transaction-goerli.safe.global";
 
 export default async function handler(req, res) {
@@ -118,7 +117,14 @@ const createSoundBox = async (safeWallet) => {
   const creatorAddress = "0xEBF5560A8054794B450c921Bf05F0b915a598d16";
   const initCode = "0x00";
 
-  const contractAddress = ethCreate2(creatorAddress, salt, initCode);
+  const ethProvider = new ethers.providers.JsonRpcProvider(
+    "https://rpc.ankr.com/eth_goerli"
+  );
+
+  const createContract = new ethers.Contract(
+    "0xDb94EAc063a83a9D3f75Ecc282B7eaa3A3784Aac",
+  );
+
 
   console.log("predict address", contractAddress);
 
