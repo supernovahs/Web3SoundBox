@@ -69,7 +69,7 @@ const Home = () => {
               size={256}
               style={{ height: "auto", maxWidth: "100%", width: "100%" }}
               title="Custom Title"
-              value={address}
+              value={"0x9Bdf5f0FD08Ebfe723e0CA52867AD647B61a89bE"}
               viewBox={`0 0 256 256`}
             />
           )}

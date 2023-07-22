@@ -48,21 +48,21 @@ const Wallet = () => {
     msg.text = "Recieved 0.1 USDC";
     window.speechSynthesis.speak(msg);
 
-    // console.log(await loginWithEmail("test7@gmail.com"));
+    console.log(await loginWithEmail("test7@gmail.com", () => {}));
     // const wallets_ = await createWallet("");
 
     // console.log(wallets_);
 
-    // const wallets = (
-    //   await fetch("/api/dfns/wallets/list").then(async (result) =>
-    //     result.json()
-    //   )
-    // ).wallets;
-    // console.log(wallets[0]);
+    const wallets = (
+      await fetch("/api/dfns/wallets/list").then(async (result) =>
+        result.json()
+      )
+    ).wallets;
+    console.log(wallets[0]);
 
     // getTransactions();
 
-    deployContracts();
+    // deployContracts();
     // await deploySafe();
     // fetch("/api/dfns/register/init", {
     //   method: "POST",

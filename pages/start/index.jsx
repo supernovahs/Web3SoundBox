@@ -11,13 +11,14 @@ import {
 } from "@nextui-org/react";
 import Head from "next/head";
 
-import { loginWithEmail } from "../../lib/dfns";
+import { createWallet, getWallets, loginWithEmail } from "../../lib/dfns";
+import { deployContracts } from "../../lib/deploy";
 const Start = () => {
   const [email, setEmail] = useState("");
   const [error, setError] = useState(null);
   const [network, setNetwork] = useState(null);
 
-  const [loadingState, setLoadingState] = useState(false);
+  const [loadingState, setLoadingState] = useState(null);
 
   useEffect(() => {
     setError(null);
@@ -29,7 +30,13 @@ const Start = () => {
   const handleSubmit = async (e) => {
     setLoadingState("Loading...");
     await loginWithEmail(email, (event) => setLoadingState(event));
-      
+    getWallets().then(async (wallets) => {
+      console.log(wallets);
+    });
+    // if (loadingState ?? "".includes("Register")) {
+    //   await createWallet(email, (event) => setLoadingState(event));
+    await deployContracts((event) => setLoadingState(event));
+    // }
   };
   return (
     <>

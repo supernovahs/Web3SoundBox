@@ -10,7 +10,7 @@ export async function getStaticProps() {
 
   const mainWallet = wallets[0];
 
-  const { safeWallet } = await fetch("/api/dfns/safe/wallet", {
+  const { safeWallet } = await fetch("localhost:3000/api/dfns/safe/wallet", {
     method: "POST",
   }).then((res) => res.json());
   const props = {
