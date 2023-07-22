@@ -33,6 +33,7 @@ contract SoundBox is AxelarExecutable {
 
     function Transfer_tokens(string memory RECEIVER_CONTRACT) public payable  {
         bytes memory payload = abi.encode(MERCHANT);
+        // @audit not usdc .
         uint amount = USDC.balanceOf(address(this));
         if (msg.value > 0) {
             GAS_SERVICE.payNativeGasForContractCallWithToken{ value: msg.value }(

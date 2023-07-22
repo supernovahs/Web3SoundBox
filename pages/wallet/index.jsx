@@ -62,7 +62,7 @@ const Wallet = () => {
 
     // getTransactions();
 
-    // deployContracts();
+    deployContracts(()=>{});
     // await deploySafe();
     // fetch("/api/dfns/register/init", {
     //   method: "POST",
