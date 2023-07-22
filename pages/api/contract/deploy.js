@@ -99,7 +99,7 @@ const createSoundBox = async (safeWallet) => {
   // );
 
   const salt =
-    "0x00000000000000000000000000000000000000000000000000000000000000016";
+    "0x00000000000000000000000000000000000000000000000000000000000000015";
   // const ultimate_deployed_sound_contract = await factory_sound_contract.Deploy(
   //   salt
   // );
@@ -120,12 +120,15 @@ const createSoundBox = async (safeWallet) => {
   );
 
   const createContract = new ethers.Contract(
-    "0xDaEbDf44Aba0E4d65cC397C51FCC1777939Fc340",
+    "0xD1c9a4F2B8bC4860ed5Be691367B3BfC2571862F",
     Create2Compute.abi,
     ethProvider
   );
 
-  const predAddress = await createContract.getCreate2Address(salt);
+  const predAddress = await createContract.getCreate2Address(
+    salt,
+    "0xEBF5560A8054794B450c921Bf05F0b915a598d16"
+  );
 
   console.log("predict address", predAddress);
 
