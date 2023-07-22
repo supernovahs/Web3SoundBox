@@ -101,7 +101,7 @@ const Start = () => {
               <>
                 <Text
                   h3
-                  size={24}
+                  size={34}
                   css={{
                     textGradient: "45deg, $blue600 -20%, $blue500 50%",
                     textAlign: "center",

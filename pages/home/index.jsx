@@ -17,6 +17,7 @@ import { styled } from "@nextui-org/react";
 
 import { truncateEthAddress } from "../../lib/utils";
 import getLatestTransactions from "../../lib/etherscan";
+import { BigNumber, ethers } from "ethers";
 
 function Home() {
   const [mainWallet, setMainWallet] = useState(null);
@@ -192,6 +193,7 @@ function Home() {
                   css={{
                     width: "80%",
                     height: "100%",
+                    mt: "120px",
                   }}
                 >
                   <Table
@@ -225,7 +227,9 @@ function Home() {
                             if (columnKey === "value")
                               return (
                                 <Table.Cell>
-                                  {tx[columnKey] / 1000000000000000000 + " ETH"}
+                                  {BigNumber.from(tx[columnKey]).div(
+                                    BigNumber.from(10).pow(18).toString()
+                                  ) + " ETH"}
                                 </Table.Cell>
                               );
                             return <Table.Cell>{tx[columnKey]}</Table.Cell>;
