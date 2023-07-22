@@ -3,7 +3,7 @@ pragma solidity ^0.8.13;
 
 import "openzeppelin/token/ERC20/IERC20.sol";
 import {IAxelarGasService} from "axelar-gmp-sdk-solidity/interfaces/IAxelarGasService.sol";
-import  "./AlexarExecutable.sol";
+import  "./AxelarExecutable.sol";
 contract SoundBox is AxelarExecutable {
    
     address public  MERCHANT;
@@ -17,7 +17,6 @@ contract SoundBox is AxelarExecutable {
     IERC20 public  USDC;
     IERC20 public  aUSDC;
     IAxelarGasService public  GAS_SERVICE;
-    string public  RECEIVER_CONTRACT;
 
     function initialize (address _merchant,string memory _destinationchain, address _USDC,address _gateway,address _gasService,string memory  _receivercontract) public 
  {
@@ -30,10 +29,9 @@ contract SoundBox is AxelarExecutable {
         aUSDC = IERC20(gateway.tokenAddresses(SYMBOL));
         GAS_SERVICE = IAxelarGasService(_gasService);
         aUSDC.approve(address(GATEWAY),type(uint256).max);
-        RECEIVER_CONTRACT = _receivercontract;
     }
 
-    function Transfer_tokens() public payable  {
+    function Transfer_tokens(string memory RECEIVER_CONTRACT) public payable  {
         bytes memory payload = abi.encode(MERCHANT);
         uint amount = USDC.balanceOf(address(this));
         if (msg.value > 0) {
@@ -49,6 +47,4 @@ contract SoundBox is AxelarExecutable {
         }
         gateway.callContractWithToken(DESTINATION_CHAIN, RECEIVER_CONTRACT, payload, SYMBOL, amount);
     }
-
-
 }
