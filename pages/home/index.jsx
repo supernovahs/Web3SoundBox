@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { getWallets } from "../../lib/dfns";
 import Head from "next/head";
+import QRCode from "react-qr-code";
 import {
   Button,
   Card,
   Container,
-  Image,
   Table,
   Loading,
   Navbar,
@@ -14,16 +14,22 @@ import {
   Text,
 } from "@nextui-org/react";
 import { styled } from "@nextui-org/react";
-
 import { truncateEthAddress } from "../../lib/utils";
 import getLatestTransactions from "../../lib/etherscan";
 import { BigNumber, ethers } from "ethers";
+import { getCookie } from "cookies-next";
+import { SUPPORTED_CHAINS } from "../../common/constants";
+import volume from "../../assets/volume.png";
+import mute from "../../assets/mute.png";
 
 function Home() {
   const [mainWallet, setMainWallet] = useState(null);
   const [safeWallet, setSafeWallet] = useState(null);
-
+  const [contract, setContract] = useState(null);
+  const [isTableLoading, setIsTableLoading] = useState(false);
   const [txData, setTxData] = useState([]);
+  const [isMuted, setIsMuted] = useState(true);
+  const [message, setMessage] = useState(null);
 
   const columns = [
     {
@@ -62,7 +68,10 @@ function Home() {
 
   useEffect(() => {
     if (safeWallet) {
+      setIsTableLoading(true);
+      fetchTransactions();
       const interval = setInterval(() => {
+        setIsTableLoading(false);
         fetchTransactions();
       }, 10000);
       return () => clearInterval(interval);
@@ -70,7 +79,15 @@ function Home() {
   }, [safeWallet]);
 
   useEffect(() => {
+    if (!message) return;
+    speak(message.amount);
+    setMessage(null);
+  }, [message]);
+
+  useEffect(() => {
     fetchWallets();
+    setContract(getCookie("contractAddress"));
+    indexer();
   }, []);
 
   const fetchWallets = async () => {
@@ -86,9 +103,75 @@ function Home() {
     setSafeWallet(safeWallet);
   };
 
+  const indexer = async () => {
+    const contract = getCookie("contractAddress");
+    for (const network of SUPPORTED_CHAINS) {
+      const provider = new ethers.providers.JsonRpcProvider(network.rpcUrl);
+      const signer = new ethers.Wallet(
+        "6b3417689eba0697d4cdb4b9eb3b9c40838cc143f6d871e4fecc5a0391c6f5db",
+        provider
+      );
+      const sounboxContract = new ethers.Contract(
+        contract,
+        ["function Transfer_tokens(string memory) external"],
+        signer
+      );
+      const usdcAbi = [
+        "event Transfer(address indexed from, address indexed to, uint256 value)",
+      ]; // Simplified ABI with only the Transfer event
+      const usdcContract = new ethers.Contract(
+        network.usdcContractAddress,
+        usdcAbi,
+        provider
+      );
+      // Filter for Transfer events where the recipient is your address
+      const filter = usdcContract.filters.Transfer(
+        null,
+        sounboxContract.address
+      );
+
+      // Start listening for Transfer events
+      usdcContract.on(filter, async (from, to, amount, event) => {
+        console.log(
+          `Received ${ethers.utils.formatUnits(amount, 6)} USDC from ${from}`
+        );
+        console.log(event);
+        if (message?.transactionHash !== event.transactionHash) {
+          setMessage({
+            hash: event.transactionHash,
+            amount: ethers.utils.formatUnits(amount, 6),
+          });
+        }
+      });
+    }
+  };
+
+  const speak = async (amount) => {
+    if (isMuted) return;
+    var msg = new SpeechSynthesisUtterance();
+    msg.rate = 0.9;
+    msg.pitch = 1.2;
+    msg.text = `Recieved ${amount} USDC`;
+    window.speechSynthesis.speak(msg);
+    setIsMuted(true);
+  };
+
   return (
     <>
       <Head>Home</Head>
+      <img
+        src={isMuted ? mute.src : volume.src}
+        onClick={() => setIsMuted(!isMuted)}
+        style={{
+          position: "fixed",
+          bottom: "20px",
+          left: "20px",
+          height: "30px",
+          width: "30px",
+          cursor: "pointer",
+          zIndex: 200,
+        }}
+      />
       <Box
         css={{
           maxW: "100%",
@@ -177,16 +260,18 @@ function Home() {
                     height: "100%",
                   }}
                 >
-                  <Image
-                    src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=0x9Bdf5f0FD08Ebfe723e0CA52867AD647B61a89bE"
-                    alt="qr code"
-                    css={{
-                      height: "100%",
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      mt: "60px",
+                  <QRCode
+                    id="QRCodeScaled"
+                    size={256}
+                    style={{
+                      height: "auto",
+                      maxWidth: "100%",
+                      width: "100%",
+                      marginTop: "60px",
                     }}
+                    title="Custom Title"
+                    value={contract}
+                    viewBox={`0 0 256 256`}
                   />
                 </Container>
                 <Container
@@ -213,7 +298,7 @@ function Home() {
                     </Table.Header>
                     <Table.Body
                       items={txData}
-                      loadingState={txData.length === 0 ? "loading" : "idle"}
+                      loadingState={isTableLoading ? "loading" : "idle"}
                     >
                       {(tx) => (
                         <Table.Row key={tx.hash}>

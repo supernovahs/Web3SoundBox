@@ -44,11 +44,6 @@ const Wallet = () => {
   ];
   const handleClick = async () => {
     execute();
-    var msg = new SpeechSynthesisUtterance();
-    msg.rate = 0.8;
-    msg.pitch = 1.5;
-    msg.text = "Recieved 0.1 USDC";
-    window.speechSynthesis.speak(msg);
 
     console.log(await loginWithEmail("test7@gmail.com", () => {}));
     // const wallets_ = await createWallet("");
