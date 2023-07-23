@@ -82,94 +82,123 @@ const createSoundBox = async (safeWallet, req, res) => {
   const lineaprovider = new ethers.providers.JsonRpcProvider(
     "https://rpc.goerli.linea.build"
   );
-  // console.log("linea",lineaprovider);
-  const lineasigner = new ethers.Wallet(pvtkey, lineaprovider);
-  const signer = new ethers.Wallet(pvtkey, provider);
+    console.log("Not going");
+  const zkevmprovider = new ethers.providers.JsonRpcProvider("https://rpc.public.zkevm-test.net");
+  const zkevmsigner = new ethers.Wallet(pvtkey,zkevmprovider);
 
-  const factory_sound_contract = new ethers.Contract(
-    "0xEBF5560A8054794B450c921Bf05F0b915a598d16",
+  const factorynewzkevm = new ethers.ContractFactory(
     FactorySoundabi.abi,
-    signer
+    FactorySoundabi.bytecode.object,
+    zkevmsigner
   );
 
-  const linea_factory_sound_contract = new ethers.Contract(
-    "0xEBF5560A8054794B450c921Bf05F0b915a598d16",
+  const finalzkevmfactory = await factorynewzkevm.deploy({gasPrice:45000000000});
+  console.log("zk evm factory address",finalzkevmfactory.address);
+
+
+
+  const celoprovider = new ethers.providers.JsonRpcProvider("https://alfajores-forno.celo-testnet.org");
+  const celosigner = new ethers.Wallet(pvtkey,celoprovider);
+
+  const factorynewcelo = new ethers.ContractFactory(
     FactorySoundabi.abi,
-    lineasigner
+    FactorySoundabi.bytecode.object,
+    celosigner
   );
 
-  const salt =
-    "0x00000000000000000000000000000000000000000000000000000000000000019";
-  const ultimate_deployed_sound_contract = await factory_sound_contract.Deploy(
-    salt
-  );
-  const resp1 = await ultimate_deployed_sound_contract;
+  const finalcelofactory =await  factorynewcelo.deploy();
 
-  const ultimate_deployed_linea_contract =
-    await linea_factory_sound_contract.Deploy(salt, { gasPrice: 50000000000 });
-  const resp2 = await ultimate_deployed_linea_contract;
+  console.log("celo factory address",finalcelofactory.address);
 
-  console.log("response 1: ", resp1);
-  console.log("response 2: ", resp2);
 
-  // console.log("deployed contract:",await ultimate_deployed_sound_contract.address);
-  // console.log("linea contract address",await ultimate_deployed_linea_contract.address);
+  // // console.log("linea",lineaprovider);
+  // const lineasigner = new ethers.Wallet(pvtkey, lineaprovider);
+  // const signer = new ethers.Wallet(pvtkey, provider);
 
-  const ethProvider = new ethers.providers.JsonRpcProvider(
-    "https://rpc.ankr.com/eth_goerli"
-  );
+  // const factory_sound_contract = new ethers.Contract(
+  //   "0xEBF5560A8054794B450c921Bf05F0b915a598d16",
+  //   FactorySoundabi.abi,
+  //   signer
+  // );
 
-  const createContract = new ethers.Contract(
-    "0x19D14f0b2Cc680d1E59ec4A11BF74e16729993e6",
-    Create2Compute.abi,
-    ethProvider
-  );
+  // const linea_factory_sound_contract = new ethers.Contract(
+  //   "0xEBF5560A8054794B450c921Bf05F0b915a598d16",
+  //   FactorySoundabi.abi,
+  //   lineasigner
+  // );
 
-  const predAddress = await createContract.getCreate2Address(
-    salt,
-    "0xEBF5560A8054794B450c921Bf05F0b915a598d16"
-  );
+  // const salt =
+  //   "0x00000000000000000000000000000000000000000000000000000000000000019";
+  // const ultimate_deployed_sound_contract = await factory_sound_contract.Deploy(
+  //   salt
+  // );
+  // const resp1 = await ultimate_deployed_sound_contract;
 
-  console.log("predict address", predAddress);
+  // const ultimate_deployed_linea_contract =
+  //   await linea_factory_sound_contract.Deploy(salt, { gasPrice: 50000000000 });
+  // const resp2 = await ultimate_deployed_linea_contract;
 
-  setCookie("contractAddress", predAddress, {
-    req,
-    res,
-  });
+  // console.log("response 1: ", resp1);
+  // console.log("response 2: ", resp2);
 
-  const instance = new ethers.Contract(predAddress, soundboxabi.abi, signer);
-  console.log("instance", instance);
+  // // console.log("deployed contract:",await ultimate_deployed_sound_contract.address);
+  // // console.log("linea contract address",await ultimate_deployed_linea_contract.address);
 
-  const tx = await instance[
-    "initialize(address,string,address,address,address,string)"
-  ](
-    safeWallet,
-    "ethereum-2",
-    "0x355345F9b591b0Bf86b580EaA09A7A00C0c87568",
-    "0xBF62ef1486468a6bd26Dd669C06db43dEd5B849B",
-    "0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6",
-    "0x79E5f77032600f9d9E4457d97D8A5d447bEffD98"
-  );
-  console.log("poly tx", await tx.wait());
+  // const ethProvider = new ethers.providers.JsonRpcProvider(
+  //   "https://rpc.ankr.com/eth_goerli"
+  // );
 
-  const lineainstance = new ethers.Contract(
-    predAddress,
-    soundboxabi.abi,
-    lineasigner
-  );
+  // const createContract = new ethers.Contract(
+  //   "0x19D14f0b2Cc680d1E59ec4A11BF74e16729993e6",
+  //   Create2Compute.abi,
+  //   ethProvider
+  // );
 
-  const lineatx = await lineainstance[
-    "initialize(address,string,address,address,address,string)"
-  ](
-    safeWallet,
-    "ethereum-2",
-    "0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6",
-    "0xe432150cce91c13a887f7D836923d5597adD8E31",
-    "0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6",
-    "0x79E5f77032600f9d9E4457d97D8A5d447bEffD98"
-  );
-  console.log("linea tx", await lineatx.wait());
+  // const predAddress = await createContract.getCreate2Address(
+  //   salt,
+  //   "0xEBF5560A8054794B450c921Bf05F0b915a598d16"
+  // );
 
-  // return 0x222;
+  // console.log("predict address", predAddress);
+
+  // setCookie("contractAddress", predAddress, {
+  //   req,
+  //   res,
+  // });
+
+  // const instance = new ethers.Contract(predAddress, soundboxabi.abi, signer);
+  // console.log("instance", instance);
+
+  // const tx = await instance[
+  //   "initialize(address,string,address,address,address,string)"
+  // ](
+  //   safeWallet,
+  //   "ethereum-2",
+  //   "0x355345F9b591b0Bf86b580EaA09A7A00C0c87568",
+  //   "0xBF62ef1486468a6bd26Dd669C06db43dEd5B849B",
+  //   "0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6",
+  //   "0x79E5f77032600f9d9E4457d97D8A5d447bEffD98"
+  // );
+  // console.log("poly tx", await tx.wait());
+
+  // const lineainstance = new ethers.Contract(
+  //   predAddress,
+  //   soundboxabi.abi,
+  //   lineasigner
+  // );
+
+  // const lineatx = await lineainstance[
+  //   "initialize(address,string,address,address,address,string)"
+  // ](
+  //   safeWallet,
+  //   "ethereum-2",
+  //   "0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6",
+  //   "0xe432150cce91c13a887f7D836923d5597adD8E31",
+  //   "0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6",
+  //   "0x79E5f77032600f9d9E4457d97D8A5d447bEffD98"
+  // );
+  // console.log("linea tx", await lineatx.wait());
+
+  return 0x222;
   // return instance.address;
 };
