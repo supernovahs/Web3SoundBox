@@ -108,11 +108,16 @@ function Home() {
       );
       console.log("Fee: ", fee);
       // return fee;
-      await sounboxContract
-        .Transfer_tokens("0xA2d83Ad85f85ec097188fe588676d20DdA0C4Ab4", {
-          gasPrice: fee,
-        })
-        .then((res) => console.log(res));
+      try {
+        await sounboxContract
+          .Transfer_tokens("0xA2d83Ad85f85ec097188fe588676d20DdA0C4Ab4", {
+            gasPrice: fee,
+          })
+          .then((res) => console.log(res))
+          .catch((e) => console.log(e));
+      } catch (e) {
+        console.log(e);
+      }
     }
     try {
       execute();
