@@ -10,3 +10,25 @@ Users can pay through any EVM supported chain through our unified QR code.
 - We use Axelar to send cross chain token transfer messages to send USDC to merchant through various source chains periodically by calling `Transfer_Tokens()` through the app automatically in the backend.
 
 
+## Tech
+
+- ### Axelar
+  Completed tx on polygon - https://testnet.axelarscan.io/gmp/0xad59bad137330f0062768a4891789c94c10709a9ed142dfa48bb450acc505195:35
+ Axelar has a cool feature of adding more gas. I liked it . Also I liked the UI , where we could see all txs clearly with hashes and diagrams.
+
+- ### Dfns
+  https://github.com/supernovahs/Web3SoundBox/tree/main/pages/api/dfns
+  We are using Dfns to verify offline merchants easily. Then it is used to interact with SafeSDK and create wallets.
+
+- ### Safe SDK
+ We made changes in safe Sdk to incorporate Dfns with it . Our offline merchants receive USDC in their safe wallets under the hood.
+
+- ### Celo
+  We support Celo network in our contracts. Merchants can receive value using celo network as well .
+
+- ### Polygon
+  We use polygon networks to send cross chain message to send USDC to merchants .
+  https://testnet.axelarscan.io/gmp/0xad59bad137330f0062768a4891789c94c10709a9ed142dfa48bb450acc505195:35
+
+
+  
