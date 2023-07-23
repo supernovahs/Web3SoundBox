@@ -8,7 +8,7 @@ import "./AxelarExecutable.sol";
 import "openzeppelin/access/Ownable.sol";
 contract DestinationChain is AxelarExecutable,Ownable{
 
-    IERC20 USDC = IERC20(0x42451e7F68ef0d63d67dE1333aF7e6a246b275bd);
+    IERC20 USDC = IERC20(0x36119da101Dbe03ea42E6C2aa975115aB8B7e71b);
     IERC20 a_USDC;
     constructor(){
         initialize_executable(0xe432150cce91c13a887f7D836923d5597adD8E31);
