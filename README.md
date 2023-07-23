@@ -31,4 +31,10 @@ Users can pay through any EVM supported chain through our unified QR code.
   https://testnet.axelarscan.io/gmp/0xad59bad137330f0062768a4891789c94c10709a9ed142dfa48bb450acc505195:35
 
 
+### Contracts
+
+-Factory Contracts using create across different chains : 0xEBF5560A8054794B450c921Bf05F0b915a598d16
+- SoundBox contracts  using create2 : 0xb9569317a8769E09C42B3970b2944bB1cCBCa3Ed
+  
+
   
