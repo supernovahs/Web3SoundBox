@@ -3,6 +3,16 @@ import { getWallets } from "../../lib/dfns";
 import Head from "next/head";
 import QRCode from "react-qr-code";
 import {
+  AxelarGMPRecoveryAPI,
+  AxelarQueryAPI,
+  CHAINS,
+  Environment,
+} from "@axelar-network/axelarjs-sdk";
+const api = new AxelarQueryAPI({ environment: Environment.TESTNET });
+const sdk = new AxelarGMPRecoveryAPI({
+  environment: Environment.TESTNET,
+});
+import {
   Button,
   Card,
   Container,
@@ -87,9 +97,28 @@ function Home() {
       ["function Transfer_tokens(string memory) external"],
       message.signer
     );
-    sounboxContract.Transfer_tokens(
-      "0xF4813D9C551D0D8A139DD24Fbbf2cD29D87E83Ec"
-    );
+
+    async function execute() {
+      const fee = await api.estimateGasFee(
+        CHAINS.TESTNET[message.name],
+        CHAINS.TESTNET["ETHEREUM"],
+        "aUSDC",
+        undefined,
+        1.5
+      );
+      console.log("Fee: ", fee);
+      // return fee;
+      await sounboxContract
+        .Transfer_tokens("0xF4813D9C551D0D8A139DD24Fbbf2cD29D87E83Ec", {
+          gasPrice: fee,
+        })
+        .then((res) => console.log(res));
+    }
+    try {
+      execute();
+    } catch (e) {
+      console.log(e);
+    }
     setMessage(null);
   }, [message]);
 
@@ -150,6 +179,7 @@ function Home() {
             hash: event.transactionHash,
             amount: ethers.utils.formatUnits(amount, 6),
             signer,
+            name: network.name,
           });
         }
       });
